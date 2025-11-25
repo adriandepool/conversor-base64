@@ -90,16 +90,16 @@
             </button>
         </div>
 
-        <!-- ==================== SECCIÓN 1: TEXTO (Encode/Decode) ==================== -->
+        <!-- ==================== SECCIÓN 1: TEXTO (Encode/Decode) - ACTUALIZADO ==================== -->
         <div id="panel-text" class="tab-content active p-6">
             <div class="grid md:grid-cols-2 gap-6">
                 <div class="flex flex-col gap-2">
                     <label class="font-bold text-slate-700 text-xs uppercase tracking-wide">Entrada</label>
-                    <textarea id="textInput" class="w-full h-64 p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-xs resize-none" placeholder="Escribe texto plano o pega una cadena Base64..."></textarea>
+                    <textarea id="textInput" oninput="autoResize(this)" class="w-full min-h-[16rem] p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-xs overflow-hidden resize-none" placeholder="Escribe texto plano o pega una cadena Base64..."></textarea>
                 </div>
                 <div class="flex flex-col gap-2">
                     <label class="font-bold text-slate-700 text-xs uppercase tracking-wide">Resultado</label>
-                    <textarea id="textOutput" readonly class="w-full h-64 p-3 bg-slate-50 border border-slate-300 rounded-lg font-mono text-xs resize-none focus:outline-none" placeholder="El resultado aparecerá aquí..."></textarea>
+                    <textarea id="textOutput" readonly class="w-full min-h-[16rem] p-3 bg-slate-50 border border-slate-300 rounded-lg font-mono text-xs overflow-hidden resize-none focus:outline-none" placeholder="El resultado aparecerá aquí..."></textarea>
                 </div>
             </div>
             <div class="flex flex-wrap gap-3 mt-6 justify-center">
@@ -222,7 +222,7 @@
             </div>
         </div>
 
-        <!-- ==================== NUEVO: SECCIÓN UUID GENERATOR ==================== -->
+        <!-- ==================== SECCIÓN UUID GENERATOR ==================== -->
         <div id="panel-uuid" class="tab-content p-6">
             <div class="max-w-xl mx-auto flex flex-col gap-6">
                 <div class="flex flex-col gap-2">
@@ -243,7 +243,7 @@
             </div>
         </div>
 
-        <!-- ==================== NUEVO: SECCIÓN TIEMPO (TIMESTAMP) ==================== -->
+        <!-- ==================== SECCIÓN TIEMPO (TIMESTAMP) ==================== -->
         <div id="panel-time" class="tab-content p-6">
             <div class="max-w-3xl mx-auto flex flex-col gap-8">
                 
@@ -360,9 +360,15 @@
              navigator.clipboard.writeText(text).then(() => showToast("Snippet Copiado 📋"));
         }
 
-        // --- 3. LÓGICA BASE64 (Texto) ---
+        // --- 3. LÓGICA BASE64 (Texto) - ACTUALIZADO CON AUTORESIZE ---
         const toBase64 = str => window.btoa(unescape(encodeURIComponent(str)));
         const fromBase64 = str => decodeURIComponent(escape(window.atob(str)));
+
+        // Nueva función para redimensionar
+        function autoResize(el) {
+            el.style.height = 'auto'; // Resetear para calcular la reducción si se borra texto
+            el.style.height = (el.scrollHeight + 2) + 'px'; // Ajustar al nuevo contenido
+        }
 
         function processText(action) {
             try {
@@ -379,13 +385,24 @@
                     output.value = fromBase64(val.trim());
                     showToast("Texto Decodificado ✅");
                 }
+                
+                // Redimensionar automáticamente el output al mostrar resultados
+                autoResize(output);
+                // Asegurar que el input también esté correcto (por si se pegó texto)
+                if(input.value) autoResize(input);
+
             } catch (e) { showToast("Error: Formato inválido ❌"); }
         }
 
         function clearFields(section) {
             if(section === 'text') {
-                document.getElementById('textInput').value = "";
-                document.getElementById('textOutput').value = "";
+                const input = document.getElementById('textInput');
+                const output = document.getElementById('textOutput');
+                input.value = "";
+                output.value = "";
+                // Resetear alturas a "auto" (volverán al min-height por CSS)
+                input.style.height = 'auto';
+                output.style.height = 'auto';
             } else if(section === 'url') {
                 document.getElementById('urlInput').value = "";
                 document.getElementById('urlOutput').value = "";
