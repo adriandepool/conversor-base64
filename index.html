@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevTools Master: Base64, JSON, Hash, URL</title>
+    <title>DevTools Master: Base64, JSON, Hash, URL, UUID, Time</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Ajustes finos para el Canvas */
@@ -53,7 +53,7 @@
     <!-- Encabezado -->
     <header class="text-center mb-6 max-w-2xl">
         <h1 class="text-3xl font-bold text-blue-700 mb-1">DevTools Master</h1>
-        <p class="text-slate-500 text-sm">Suite de utilidades: Base64, JSON, Hash, JWT, Hex y URL</p>
+        <p class="text-slate-500 text-sm">Suite de utilidades: Base64, JSON, Hash, JWT, URL, UUID y Tiempo</p>
     </header>
 
     <!-- Contenedor Principal -->
@@ -75,6 +75,12 @@
             </button>
             <button onclick="switchTab('jwt')" id="tab-jwt" class="tab-btn flex-shrink-0 py-4 px-6 text-sm font-semibold text-slate-500 hover:text-blue-600 hover:bg-white transition-all">
                 🔑 JWT
+            </button>
+             <button onclick="switchTab('uuid')" id="tab-uuid" class="tab-btn flex-shrink-0 py-4 px-6 text-sm font-semibold text-slate-500 hover:text-blue-600 hover:bg-white transition-all">
+                🆔 UUID
+            </button>
+            <button onclick="switchTab('time')" id="tab-time" class="tab-btn flex-shrink-0 py-4 px-6 text-sm font-semibold text-slate-500 hover:text-blue-600 hover:bg-white transition-all">
+                ⏰ Tiempo
             </button>
             <button onclick="switchTab('url')" id="tab-url" class="tab-btn flex-shrink-0 py-4 px-6 text-sm font-semibold text-slate-500 hover:text-blue-600 hover:bg-white transition-all">
                 🔗 URL
@@ -151,7 +157,7 @@
             </div>
         </div>
 
-        <!-- ==================== NUEVO: SECCIÓN JSON FORMATTER ==================== -->
+        <!-- ==================== SECCIÓN JSON FORMATTER ==================== -->
         <div id="panel-json" class="tab-content p-6">
             <div class="grid md:grid-cols-2 gap-6">
                 <div class="flex flex-col gap-2">
@@ -171,7 +177,7 @@
             </div>
         </div>
 
-        <!-- ==================== NUEVO: SECCIÓN HASH (SHA/MD5) ==================== -->
+        <!-- ==================== SECCIÓN HASH (SHA/MD5) ==================== -->
         <div id="panel-hash" class="tab-content p-6">
             <div class="flex flex-col gap-6 max-w-2xl mx-auto">
                 <div class="flex flex-col gap-2">
@@ -196,7 +202,7 @@
             </div>
         </div>
 
-        <!-- ==================== SECCIÓN 3: JWT DEBUGGER ==================== -->
+        <!-- ==================== SECCIÓN JWT DEBUGGER ==================== -->
         <div id="panel-jwt" class="tab-content p-6">
             <div class="flex flex-col gap-4">
                 <div class="grid md:grid-cols-3 gap-6">
@@ -216,7 +222,65 @@
             </div>
         </div>
 
-        <!-- ==================== SECCIÓN 4: URL ENCODE ==================== -->
+        <!-- ==================== NUEVO: SECCIÓN UUID GENERATOR ==================== -->
+        <div id="panel-uuid" class="tab-content p-6">
+            <div class="max-w-xl mx-auto flex flex-col gap-6">
+                <div class="flex flex-col gap-2">
+                    <label class="font-bold text-slate-700 text-xs uppercase tracking-wide">Cantidad a Generar</label>
+                    <div class="flex gap-2">
+                        <input type="number" id="uuidCount" value="1" min="1" max="50" class="w-24 p-2 border border-blue-300 rounded-lg text-center">
+                        <button onclick="generateUUIDs()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">Generar UUIDs</button>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="font-bold text-slate-700 text-xs uppercase tracking-wide">Resultado (UUID v4)</label>
+                    <textarea id="uuidOutput" readonly class="w-full h-64 p-3 bg-slate-50 border border-slate-300 rounded-lg font-mono text-sm resize-none focus:outline-none text-slate-700" placeholder="Los UUIDs aparecerán aquí..."></textarea>
+                </div>
+                 <div class="flex justify-center">
+                    <button onclick="copyToClipboard('uuidOutput')" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-6 py-2 rounded-lg font-medium">Copiar Lista</button>
+                 </div>
+            </div>
+        </div>
+
+        <!-- ==================== NUEVO: SECCIÓN TIEMPO (TIMESTAMP) ==================== -->
+        <div id="panel-time" class="tab-content p-6">
+            <div class="max-w-3xl mx-auto flex flex-col gap-8">
+                
+                <!-- Reloj Actual -->
+                <div class="bg-blue-50 border border-blue-100 rounded-xl p-6 text-center">
+                    <p class="text-xs font-bold text-blue-500 uppercase mb-1">Hora Actual (UTC)</p>
+                    <div class="text-3xl font-mono text-blue-800 font-bold mb-2" id="liveTime">Cargando...</div>
+                    <div class="text-sm font-mono text-blue-600 bg-white inline-block px-3 py-1 rounded border border-blue-100" id="liveTimestamp">...</div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Epoch a Fecha -->
+                    <div class="flex flex-col gap-4 p-4 border border-slate-200 rounded-xl">
+                        <h3 class="font-bold text-slate-700 text-sm">Timestamp ➡ Fecha</h3>
+                        <input type="number" id="tsInput" placeholder="Ej: 1672531200" class="w-full p-2 border border-slate-300 rounded-lg font-mono text-sm">
+                        <button onclick="convertTimestamp('toDate')" class="bg-slate-700 text-white py-2 rounded-lg hover:bg-slate-800">Convertir</button>
+                        <div class="mt-2">
+                            <label class="text-xs text-slate-500 block mb-1">Resultado (Local):</label>
+                            <input type="text" id="tsOutputDate" readonly class="w-full p-2 bg-slate-100 border border-transparent rounded-lg text-sm text-slate-700">
+                        </div>
+                    </div>
+
+                    <!-- Fecha a Epoch -->
+                    <div class="flex flex-col gap-4 p-4 border border-slate-200 rounded-xl">
+                        <h3 class="font-bold text-slate-700 text-sm">Fecha ➡ Timestamp</h3>
+                        <input type="datetime-local" id="dateInput" class="w-full p-2 border border-slate-300 rounded-lg font-mono text-sm">
+                        <button onclick="convertTimestamp('toEpoch')" class="bg-slate-700 text-white py-2 rounded-lg hover:bg-slate-800">Convertir</button>
+                        <div class="mt-2">
+                            <label class="text-xs text-slate-500 block mb-1">Resultado (Segundos):</label>
+                            <input type="text" id="dateOutputTs" readonly class="w-full p-2 bg-slate-100 border border-transparent rounded-lg text-sm text-slate-700">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECCIÓN URL ENCODE ==================== -->
         <div id="panel-url" class="tab-content p-6">
             <div class="grid md:grid-cols-2 gap-6">
                 <div class="flex flex-col gap-2">
@@ -235,7 +299,7 @@
             </div>
         </div>
 
-        <!-- ==================== SECCIÓN 5: HEXADECIMAL ==================== -->
+        <!-- ==================== SECCIÓN HEXADECIMAL ==================== -->
         <div id="panel-hex" class="tab-content p-6">
             <div class="grid md:grid-cols-2 gap-6">
                 <div class="flex flex-col gap-2">
@@ -559,6 +623,52 @@
                 showToast("Error al generar hash");
                 console.error(e);
             }
+        }
+
+        // --- 10. LÓGICA UUID ---
+        function generateUUIDs() {
+            const count = parseInt(document.getElementById('uuidCount').value) || 1;
+            const output = document.getElementById('uuidOutput');
+            let result = '';
+            
+            for(let i=0; i<count; i++) {
+                // Generador moderno y seguro
+                result += crypto.randomUUID() + '\n';
+            }
+            output.value = result.trim();
+            showToast(`Generados ${count} UUIDs 🆔`);
+        }
+
+        // --- 11. LÓGICA TIEMPO ---
+        function updateLiveTime() {
+            const now = new Date();
+            document.getElementById('liveTime').textContent = now.toISOString().replace('T', ' ').substring(0, 19);
+            document.getElementById('liveTimestamp').textContent = Math.floor(now.getTime() / 1000);
+        }
+        setInterval(updateLiveTime, 1000);
+        updateLiveTime();
+
+        function convertTimestamp(direction) {
+            try {
+                if (direction === 'toDate') {
+                    const ts = document.getElementById('tsInput').value.trim();
+                    if(!ts) return showToast("Ingresa un timestamp");
+                    // Detectar si son milisegundos (13 digitos) o segundos (10 digitos)
+                    let timestamp = parseInt(ts);
+                    if (ts.length === 10) timestamp *= 1000;
+                    
+                    const date = new Date(timestamp);
+                    document.getElementById('tsOutputDate').value = date.toLocaleString();
+                    showToast("Timestamp convertido 📆");
+                } else {
+                    const dateStr = document.getElementById('dateInput').value;
+                    if(!dateStr) return showToast("Selecciona una fecha");
+                    const date = new Date(dateStr);
+                    const ts = Math.floor(date.getTime() / 1000);
+                    document.getElementById('dateOutputTs').value = ts;
+                    showToast("Fecha convertida a Epoch ⏰");
+                }
+            } catch (e) { showToast("Error en conversión de fecha"); }
         }
     </script>
 </body>
